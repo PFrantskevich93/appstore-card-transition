@@ -64,12 +64,12 @@ final class DismissCardAnimator: NSObject, UIViewControllerAnimatedTransitioning
         // Card fills inside animated container view
         cardDetailView.edges(to: animatedContainerView)
         
-        animatedContainerView.centerXAnchor.constraint(equalTo: container.centerXAnchor).isActive = true
+        let animatedContainerLeftConstraint =  animatedContainerView.leftAnchor.constraint(equalTo: container.leftAnchor, constant: params.fromCardFrameWithoutTransform.minX)
         let animatedContainerTopConstraint = animatedContainerView.topAnchor.constraint(equalTo: container.topAnchor, constant: params.settings.cardContainerInsets.top)
         let animatedContainerWidthConstraint = animatedContainerView.widthAnchor.constraint(equalToConstant: cardDetailView.frame.width - (params.settings.cardContainerInsets.left + params.settings.cardContainerInsets.right))
         let animatedContainerHeightConstraint = animatedContainerView.heightAnchor.constraint(equalToConstant: cardDetailView.frame.height - (params.settings.cardContainerInsets.top + params.settings.cardContainerInsets.bottom))
         
-        NSLayoutConstraint.activate([animatedContainerTopConstraint, animatedContainerWidthConstraint, animatedContainerHeightConstraint])
+        NSLayoutConstraint.activate([animatedContainerTopConstraint, animatedContainerWidthConstraint, animatedContainerHeightConstraint, animatedContainerLeftConstraint])
         
         // Fix weird top inset
         let topTemporaryFix = screens.cardDetail.cardContentView.topAnchor.constraint(equalTo: cardDetailView.topAnchor)
@@ -91,6 +91,7 @@ final class DismissCardAnimator: NSObject, UIViewControllerAnimatedTransitioning
             animatedContainerTopConstraint.constant = self.params.fromCardFrameWithoutTransform.minY + params.settings.cardContainerInsets.top
             animatedContainerWidthConstraint.constant = self.params.fromCardFrameWithoutTransform.width - (params.settings.cardContainerInsets.left + params.settings.cardContainerInsets.right)
             animatedContainerHeightConstraint.constant = self.params.fromCardFrameWithoutTransform.height - (params.settings.cardContainerInsets.top + params.settings.cardContainerInsets.bottom)
+            animatedContainerLeftConstraint.constant = self.params.fromCardFrameWithoutTransform.minX + params.settings.cardContainerInsets.left
             container.layoutIfNeeded()
         }
         
