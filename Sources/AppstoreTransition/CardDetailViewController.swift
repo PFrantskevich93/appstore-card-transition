@@ -106,7 +106,7 @@ public final class CardDismissHandler: NSObject {
     var dismissalAnimator: UIViewPropertyAnimator?
     var draggingDownToDismiss = false
     
-    private let source: CardDetailViewController
+    private weak var source: CardDetailViewController?
     
     init(source: CardDetailViewController) {
         // We require source object in case we need access some properties etc.
@@ -140,7 +140,9 @@ public final class CardDismissHandler: NSObject {
     
     // This handles both screen edge and dragdown pan. As screen edge pan is a subclass of pan gesture, this input param works.
     @objc func handleDismissalPan(gesture: UIPanGestureRecognizer) {
-        
+        guard let source = self.source else {
+            return
+        }
         let velocity = gesture.velocity(in: source.view)
         //if velocity.y > 0 { return }
         
@@ -269,9 +271,9 @@ public final class CardDismissHandler: NSObject {
     func didSuccessfullyDragDownToDismiss() {
         //cardViewModel = unhighlightedCardViewModel
         //source.dismiss(animated: true)
-        self.source.didStartDismissAnimation()
-        source.dismiss(animated: true) {
-            self.source.didFinishDismissAnimation()
+        self.source?.didStartDismissAnimation()
+        source?.dismiss(animated: true) {
+            self.source?.didFinishDismissAnimation()
         }
     }
     
@@ -291,9 +293,9 @@ public final class CardDismissHandler: NSObject {
     }
     
     func shouldDismiss() -> Bool {
-        guard let scrollView = source.scrollView else { return true }
+        guard let scrollView = source?.scrollView else { return true }
         
-        if (source.settings.isEnabledBottomClose) {
+        if (source?.settings.isEnabledBottomClose == true) {
             return scrollView.contentOffset.y <= 0 || scrollView.contentOffset.y >= scrollView.contentSize.height - scrollView.frame.height
         } else {
             return scrollView.contentOffset.y <= 0
@@ -304,6 +306,7 @@ public final class CardDismissHandler: NSObject {
 
 extension CardDismissHandler: UIGestureRecognizerDelegate {
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard let source = self.source else { return false }
         checkScrolling(scrollView: source.scrollView)
         return shouldDismiss()
     }
